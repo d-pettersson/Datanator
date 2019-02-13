@@ -1,0 +1,9 @@
+# exclude libs folder
+libs/*
+
+# exclude specific OSX stuff
+.DS_Store
+
+# exclude CLion specific files
+.idea
+*cmake*
