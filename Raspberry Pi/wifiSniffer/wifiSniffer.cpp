@@ -2,15 +2,15 @@
  * WIFI SNIFFER *
  * ------------ */
 
-#include <regex>
-#include <curl/multi.h>
+#include <algorithm>
+#include <fstream>
 
 #include "wifiSniffer.h"
 #include "oscPack.h"
 
 
-//#define PRINT_OUT
-#define OSC_OUT
+#define PRINT_OUT
+//#define OSC_OUT
 
 /* ------------------- *
  * Default constructor *
@@ -36,6 +36,7 @@ void WifiSniffer::run(const std::string& interface) {
               << "* ------------ * ---------------- *\n\n";
 #endif
 
+
     sniffer.sniff_loop(make_sniffer_handler(this, &WifiSniffer::callback));
 }
 
@@ -52,12 +53,13 @@ bool WifiSniffer::callback(Tins::PDU &pdu) {
     Tins::EthernetII mac = pdu.rfind_pdu<Tins::RawPDU>().to<Tins::EthernetII>();
 
     // grab TCP for src port
-    Tins::TCP tcp = pdu.rfind_pdu<Tins::RawPDU>().to<Tins::TCP>();
+//    Tins::TCP tcp = pdu.rfind_pdu<Tins::RawPDU>().to<Tins::TCP>();
+
 
 #ifdef PRINT_OUT
 
     // print results to console
-    resultPrint(ip, mac, tcp);
+    resultPrint(ip, mac);
 
 #endif
 
@@ -65,8 +67,6 @@ bool WifiSniffer::callback(Tins::PDU &pdu) {
 
     // concat ip addr + mac addr
     std::string outputStr = ip.src_addr().to_string() + ' ' + mac.src_addr().to_string() + ' ' + ip.dst_addr().to_string() + ' ' + mac.dst_addr().to_string();
-
-    std::cout << outputStr << '\n';
 
     std::string ipSrcAddr = ip.src_addr().to_string();
     std::string ipDstAddr = ip.dst_addr().to_string();
@@ -96,7 +96,7 @@ bool WifiSniffer::callback(Tins::PDU &pdu) {
  * Print ips and MACs to console *
  * ----------------------------- */
 
-void WifiSniffer::resultPrint(Tins::IP ip, Tins::EthernetII mac, Tins::TCP tcp) {
+void WifiSniffer::resultPrint(Tins::IP ip, Tins::EthernetII mac) {
     // format helpers
     int lenSrcIp = ip.src_addr().to_string().length();
     int lenDstIp = ip.dst_addr().to_string().length();
@@ -109,19 +109,37 @@ void WifiSniffer::resultPrint(Tins::IP ip, Tins::EthernetII mac, Tins::TCP tcp) 
     lenSrcIp < 11 ? tabSrc = "\t\t" : tabSrc = "\t";
     lenDstIp < 11 ? tabDst = "\t\t" : tabDst = "\t";
 
+    std::string vendor = macVendor(mac);
+
     // print results
-    std::cout << colSrc + "src: " + colEnd << ip.src_addr() << tabSrc << colSrc + "src mac: " + colEnd << mac.src_addr() << colSrc + "\tsrc port: " + colEnd << tcp.sport()
-              << colDst + "\t\tdst: " + colEnd << ip.dst_addr() << tabDst << colDst + "dst mac: " + colEnd << mac.dst_addr() << '\n';
+    std::cout << colSrc + "src: " + colEnd << ip.src_addr() << tabSrc << colSrc + "src mac: " + colEnd << mac.src_addr()// << colSrc + "\tsrc port: " + colEnd << tcp.sport()
+              << colDst + "\t\tdst: " + colEnd << ip.dst_addr() << tabDst << colDst + "dst mac: " + colEnd << mac.dst_addr() << '\n' << colSrc + "src vendor: " + colEnd << vendor << '\n';
 }
 
 /* ----------------- *
  * MAC vendor lookup *
  * ----------------- */
 
-void macVendor(Tins::EthernetII mac) {
+std::string WifiSniffer::macVendor(Tins::EthernetII mac) {
+    std::string line;
 
+    std::string macSrcAddr = mac.src_addr().to_string();
+    macSrcAddr.erase(std::remove(macSrcAddr.begin(), macSrcAddr.end(), ':'), macSrcAddr.end());
+    macSrcAddr.erase(6,6);
 
+    std::ifstream macVendorList;
+    macVendorList.open("mac-vendor.txt");
+    std::ofstream missingVendors;
+    missingVendors.open ("missingVendors.txt", std::ios::app);
 
+    while (getline(macVendorList, line)) {
+        if (line.find(macSrcAddr) != std::string::npos) {
+            line.erase(0, 7);
+            return line;
+        }
+    }
+    missingVendors << macSrcAddr << '\n';
+    return "Unknown vendor";
 }
 
 /* -------------- *

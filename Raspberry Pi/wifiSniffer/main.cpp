@@ -5,6 +5,11 @@
 
 
 int main() {
-    WifiSniffer sniffer;
-    sniffer.run("wlan1");
+    try {
+        WifiSniffer sniffer;
+        sniffer.run("wlan1");
+    }
+    catch(const std::exception& e) {
+        std::cout << e.what();
+    }
 }

@@ -16,8 +16,9 @@ public:
 private:
     int sumOfNum(long long int& num);
     bool callback(Tins::PDU& pdu);
-    void resultPrint(Tins::IP ip, Tins::EthernetII mac, Tins::TCP tcp);
-//    void macVendor(Tins::EthernetII mac);
+    void resultPrint(Tins::IP ip, Tins::EthernetII mac);
+    std::string macVendor(Tins::EthernetII mac);
+    Tins::DNS dns;
 };
 
 
