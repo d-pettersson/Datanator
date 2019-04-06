@@ -1,4 +1,7 @@
 #include "ofApp.h"
+#include <ctime>
+
+
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -11,6 +14,7 @@ void ofApp::setup(){
     
     pointMesh.setupPointMesh();
     
+    
     cam.setPosition(ofVec3f(0, 0, 900));
     cam.lookAt(ofVec3f(0, 0 , 0));
     
@@ -20,12 +24,15 @@ void ofApp::setup(){
     
     kinect.setupKinect();
     
+    blkScreen.setupBlkScreen();
+    
     gui.setupGui();
     
     // display LAN IP in GUI
     Poco::Net::NetworkInterface::List siteLocalInterfaces = ofxNet::NetworkUtils::listNetworkInterfaces(ofxNet::NetworkUtils::SITE_LOCAL);
 
     gui.localIpLabel.setup("LAN IP", siteLocalInterfaces[0].address().toString());
+    
     
 }
 
@@ -47,7 +54,9 @@ void ofApp::update(){
 //    img.update();
     
     kinect.updateKinect();
+    kinect.depthTexture.draw(0,0);
     displayFPS();
+    blkScreen.updateBlkScreen();
 
 }
 
@@ -64,18 +73,17 @@ void ofApp::draw(){
     shader.setUniform1f("time", ofGetElapsedTimef());
     
     pointMesh.drawPointMesh();
-    
     shader.end();
-    
     cam.end();
     
     if (!toggleGui) {
         gui.drawGui();
-        kinect.depthTexture.draw(0,0);
     }
     
+    blkScreen.drawBlkScreen();
     
 }
+
 
 //--------------------------------------------------------------
 void ofApp::displayFPS() {

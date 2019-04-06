@@ -2,6 +2,7 @@
 
 uniform mat4 modelViewProjectionMatrix;
 in vec4 position;
+in vec4 normal;
 in vec2 texcoord;
 
 uniform sampler2DRect noiseTex;
@@ -116,34 +117,45 @@ float snoise3(vec3 v)
                                  dot(p2,x2), dot(p3,x3) ) );
 }
 
+
+
 void main() {
-    vec4 modPosition = modelViewProjectionMatrix * position;
+
+    float scale = 0.003;
     
-    float scale = 100;
     float kinectScale = 500;
+    
+//    vec4 modPosition = modelViewProjectionMatrix * position;
+//    modPosition.y += snoise3(vec3(modPosition.x * scale, modPosition.y * scale, time));
+    float displacement = snoise3(vec3(position.x * scale, position.y * scale, time * .1));
     
     // scale kinect texture to final size
     vec2 tc = texcoord;
     vec2 ratio = tc / texNoiseSize * texKinectSize;
     
-    float displacement = texture(noiseTex, texcoord).r;
-    float displacementKinect = texture(texKinect, ratio).r;
+//    float displacement = texture(noiseTex, texcoord).r;
+//    float displacementKinect = texture(texKinect, ratio).r;
 
-    modPosition.x += snoise3(vec3(time * position.xyz));
-    modPosition.z += snoise3(vec3(time * position.xyz));
+//    modPosition.x += snoise3(vec3(time * position.xyz));
+//    modPosition.z += snoise3(vec3(time * position.xyz));
 
 //    modPosition.z += sin(modPosition.z)*10.0;
     
-    modPosition.y += displacement * scale;
-    modPosition.y += displacementKinect * kinectScale;
+//    modPosition.y += displacement * scale;
+//    modPosition.y += displacementKinect * kinectScale;
 
 //    modPosition.y += snoise3(position.xyz) * scale * sin(time);
 //    modPosition.y += sin(modPosition.y)*20.0;
     
 //    gl_PointSize = 10;
-    gl_Position = modPosition;
+    
+    vec4 newPosition = position + normal * displacement;
+    
+    gl_Position = modelViewProjectionMatrix * newPosition;
+//    gl_Position = modPosition * 10;
 
     texCoordVarying = texcoord;
+//    noiseTexOut = vec2(modPosition.xy);
 }
 
 

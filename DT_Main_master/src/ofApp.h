@@ -11,6 +11,7 @@
 #include "pointMesh.h"
 #include "kinectManager.h"
 #include "gui.h"
+#include "blkScreen.h"
 
 
 class ofApp : public ofBaseApp{
@@ -23,7 +24,7 @@ class ofApp : public ofBaseApp{
         // shader and texture
         ofShader shader;
         ofImage img;
-    
+
         // cam and light
         ofCamera cam;
         ofLight light;
@@ -37,10 +38,12 @@ class ofApp : public ofBaseApp{
         // GUI
         Gui gui;
     
+        // BlackoutScreen
+        BlkScreen blkScreen;
+    
         bool toggleGui;
     
 //        ofx::Net::NetworkUtils::listNetworkInterfaces netUtils;
-        
     
     
         // custom functions
