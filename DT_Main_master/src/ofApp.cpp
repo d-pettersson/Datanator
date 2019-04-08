@@ -1,5 +1,4 @@
 #include "ofApp.h"
-#include <ctime>
 
 
 
@@ -14,7 +13,6 @@ void ofApp::setup(){
     
     pointMesh.setupPointMesh();
     
-    
     cam.setPosition(ofVec3f(0, 0, 900));
     cam.lookAt(ofVec3f(0, 0 , 0));
     
@@ -25,13 +23,18 @@ void ofApp::setup(){
     kinect.setupKinect();
     
     blkScreen.setupBlkScreen();
+    blkScreen.isMaster = true;
     
+    // GUI
     gui.setupGui();
     
-    // display LAN IP in GUI
     Poco::Net::NetworkInterface::List siteLocalInterfaces = ofxNet::NetworkUtils::listNetworkInterfaces(ofxNet::NetworkUtils::SITE_LOCAL);
 
     gui.localIpLabel.setup("LAN IP", siteLocalInterfaces[0].address().toString());
+
+    gui.settingsLoadedLabel.setup("Settings loaded", to_string(blkScreen.settingsLoaded));
+    if (blkScreen.settingsLoaded) gui.settingsLoadedLabel.setBackgroundColor(ofColor(0, 255, 0));
+    else gui.settingsLoadedLabel.setBackgroundColor(ofColor(255, 0, 0));
     
     
 }

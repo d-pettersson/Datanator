@@ -26,6 +26,7 @@ public:
     ofxLabel thresholdLabel;
     ofxLabel kinectCheckLabel;
     ofxLabel localIpLabel;
+    ofxLabel settingsLoadedLabel;
     
     
 };

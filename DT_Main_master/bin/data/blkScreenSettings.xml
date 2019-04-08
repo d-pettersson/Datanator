@@ -1,0 +1,9 @@
+<settings>
+	<urlImages>http://localhost:8888/images/</urlImages>
+	<nameImages>blackoutScreen_</nameImages>
+	<formatImages>.jpg</formatImages>
+	<delayTime>5.0</delayTime>
+	<numImages>5</numImages>
+	<randomSeed>50</randomSeed>
+	<occurenceTimer>200</occurenceTimer>
+</settings>

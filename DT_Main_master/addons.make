@@ -4,3 +4,5 @@ ofxNetworkUtils
 ofxOpenCv
 ofxOsc
 ofxPoco
+ofxThreadedImageLoader
+ofxXmlSettings

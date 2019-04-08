@@ -23,10 +23,7 @@ public:
     
     ofxKinect kinect;
     
-//    ofxCvGrayscaleImage depthImage;
     ofxCvGrayscaleImage depthTexture;
-//    ofxCvGrayscaleImage grayThreshNear;
-//    ofxCvGrayscaleImage grayThreshFar;
     
     int nearThreshold = 0;
     int farThreshold = 1000;
