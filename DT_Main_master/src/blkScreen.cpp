@@ -4,7 +4,8 @@
 //
 //  Creates a blackout screen.
 //  Randomised appearance in time and visuals.
-//  Sends out the screen num via osc to slaves.
+//  Sends out the screen num via osc
+//  to clients.
 //
 //  -------------------------------------------
 

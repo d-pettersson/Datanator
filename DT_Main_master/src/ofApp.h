@@ -23,11 +23,12 @@ class ofApp : public ofBaseApp{
     
         // shader and texture
         ofShader shader;
-        ofImage img;
-
+        ofShader postShader;
+        ofFbo displacementFbo;
+        ofFbo outFbo;
+    
         // cam and light
         ofCamera cam;
-        ofLight light;
     
         // geo
         PointMesh pointMesh;
@@ -43,8 +44,13 @@ class ofApp : public ofBaseApp{
     
         bool toggleGui;
     
-//        ofx::Net::NetworkUtils::listNetworkInterfaces netUtils;
+        ofxXmlSettings mainSettings;
     
+        // OSC
+        string oscLocalIp;
+        int oscLocalPort;
+        ofxOscSender oscSender;
+        ofxOscReceiver oscReceive;
     
         // custom functions
         void displayFPS();

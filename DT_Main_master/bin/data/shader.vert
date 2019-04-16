@@ -9,10 +9,15 @@ uniform sampler2DRect noiseTex;
 uniform sampler2DRect texKinect;
 
 uniform float time;
-uniform vec2 texNoiseSize;
+uniform vec2 texSize;
 uniform vec2 texKinectSize;
 
-out vec2 texCoordVarying;
+out vec2 texcoordVarying;
+
+//2D (returns 0 - 1)
+float random2d(vec2 n) {
+    return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
+}
 
 //
 // Description : Array and textureless GLSL 2D/3D/4D simplex
@@ -121,41 +126,22 @@ float snoise3(vec3 v)
 
 void main() {
 
-    float scale = 0.003;
+    float scale = 0.008;
     
-    float kinectScale = 500;
-    
-//    vec4 modPosition = modelViewProjectionMatrix * position;
-//    modPosition.y += snoise3(vec3(modPosition.x * scale, modPosition.y * scale, time));
+    float kinectScale = 1000.;
+
     float displacement = snoise3(vec3(position.x * scale, position.y * scale, time * .1));
-    
-    // scale kinect texture to final size
+
+    // scale kinect texture to rander size
     vec2 tc = texcoord;
-    vec2 ratio = tc / texNoiseSize * texKinectSize;
+    vec2 ratio = tc / texSize * texKinectSize;
     
-//    float displacement = texture(noiseTex, texcoord).r;
-//    float displacementKinect = texture(texKinect, ratio).r;
+    vec4 displacementKinectBump = texture(texKinect, ratio);
+    float displacementKinect = snoise3(vec3(displacementKinectBump.x + displacement, displacementKinectBump.y + displacement, displacementKinectBump.z));
 
-//    modPosition.x += snoise3(vec3(time * position.xyz));
-//    modPosition.z += snoise3(vec3(time * position.xyz));
-
-//    modPosition.z += sin(modPosition.z)*10.0;
-    
-//    modPosition.y += displacement * scale;
-//    modPosition.y += displacementKinect * kinectScale;
-
-//    modPosition.y += snoise3(position.xyz) * scale * sin(time);
-//    modPosition.y += sin(modPosition.y)*20.0;
-    
-//    gl_PointSize = 10;
-    
-    vec4 newPosition = position + normal * displacement;
-    
+    vec4 newPosition = position  + normal * displacementKinect;
     gl_Position = modelViewProjectionMatrix * newPosition;
-//    gl_Position = modPosition * 10;
-
-    texCoordVarying = texcoord;
-//    noiseTexOut = vec2(modPosition.xy);
+    texcoordVarying = texcoord;
 }
 
 

@@ -1,6 +1,10 @@
 //  ------------------------------------------
 //  Point mesh creator
 //  ------------------------------------------
+//
+//  Creates a mesh grid from indiv. vertices
+//
+//  ------------------------------------------
 
 #ifndef pointMesh_h
 #define pointMesh_h

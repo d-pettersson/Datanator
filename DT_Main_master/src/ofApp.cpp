@@ -3,81 +3,101 @@
 
 
 //--------------------------------------------------------------
+// setting up the application
+// loading xml settings
+// setting up geometry, kinect, blackoutscreen and GUI
+// setting up camera and geometry
+// loading up parameters for GUI
+// loading up shader
+
 void ofApp::setup(){
     
     ofBackground(0);
-    
     ofSetFrameRate(60);
-    
+    ofSetVerticalSync(true);
     ofEnableSmoothing();
     
+    // XML settings
+    mainSettings.load("mainSettings.xml");
+    oscLocalIp      = mainSettings.getValue("settings:oscHostIp", "127.0.0.1");
+    oscLocalPort    = mainSettings.getValue("settings:oscHostPort", 12345);
+    oscSender.setup(oscLocalIp, oscLocalPort);
+    
     pointMesh.setupPointMesh();
+    kinect.setupKinect();
+    blkScreen.setupBlkScreen();
+    blkScreen.isMaster = true;
+    gui.setupGui();
     
     cam.setPosition(ofVec3f(0, 0, 900));
     cam.lookAt(ofVec3f(0, 0 , 0));
     
-    shader.load("shader.vert", "shader.frag");
-    
-    img.allocate(ofGetWidth(), ofGetHeight(), OF_IMAGE_GRAYSCALE);
-    
-    kinect.setupKinect();
-    
-    blkScreen.setupBlkScreen();
-    blkScreen.isMaster = true;
+    displacementFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+    outFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+
     
     // GUI
-    gui.setupGui();
-    
+
     Poco::Net::NetworkInterface::List siteLocalInterfaces = ofxNet::NetworkUtils::listNetworkInterfaces(ofxNet::NetworkUtils::SITE_LOCAL);
 
     gui.localIpLabel.setup("LAN IP", siteLocalInterfaces[0].address().toString());
 
-    gui.settingsLoadedLabel.setup("Settings loaded", to_string(blkScreen.settingsLoaded));
+    gui.settingsLoadedLabel.setup("Blackout settings loaded", to_string(blkScreen.settingsLoaded));
     if (blkScreen.settingsLoaded) gui.settingsLoadedLabel.setBackgroundColor(ofColor(0, 255, 0));
     else gui.settingsLoadedLabel.setBackgroundColor(ofColor(255, 0, 0));
     
+    shader.load("shader.vert", "shader.frag");
+    postShader.load("postshader.vert", "postshader.frag");
     
 }
 
 //--------------------------------------------------------------
+// updating kinect and drawing depth texture
+// display FPS in title bar
+// updating blackoutscreen
+
 void ofApp::update(){
-//    float noiseScale = 0.005;
-//    float noiseVel = ofGetElapsedTimef();
-//
-//    ofPixels &pixels = img.getPixels();
-//    int w = img.getWidth();
-//    int h = img.getHeight();
-//    for(int y=0; y<h; y++) {
-//        for(int x=0; x<w; x++) {
-//            int i = y * w + x;
-//            float noiseVelue = ofNoise(x * noiseScale, y * noiseScale, noiseVel);
-//            pixels[i] = 255 * noiseVelue;
-//        }
-//    }
-//    img.update();
     
     kinect.updateKinect();
     kinect.depthTexture.draw(0,0);
     displayFPS();
     blkScreen.updateBlkScreen();
+    
+    ofxOscMessage oscMsg;
+    oscMsg.setAddress("/blkScreen/counterImg");
+    oscMsg.addIntArg(blkScreen.counterImg);
+    oscMsg.addBoolArg(blkScreen.isImageDrawn);
+    oscSender.sendMessage(oscMsg);
+
+    displacementFbo.begin();
+    cam.begin();
+    shader.begin();
+    shader.setUniformTexture("texKinect", kinect.depthTexture.getTexture(), 0);
+    shader.setUniform2f("texSize", ofGetWidth(), ofGetHeight());
+    shader.setUniform2f("texKinectSize", kinect.depthTexture.getTexture().getWidth(), kinect.depthTexture.getTexture().getHeight());
+    shader.setUniform1f("time", ofGetElapsedTimef());
+    pointMesh.drawPointMesh();
+    shader.end();
+    cam.end();
+    displacementFbo.end();
 
 }
 
 //--------------------------------------------------------------
+// drawing shader and geometry
+// toggling GUI
+// drawing blackoutscreen
+
 void ofApp::draw(){
     
-    cam.begin();
-    
-    shader.begin();
-    shader.setUniformTexture("texNoise", img.getTexture(), 0);
-    shader.setUniformTexture("texKinect", kinect.depthTexture.getTexture(), 1);
-    shader.setUniform2f("texNoiseSize", img.getTexture().getWidth(), img.getTexture().getHeight());
-    shader.setUniform2f("texKinectSize", kinect.depthTexture.getTexture().getWidth(), kinect.depthTexture.getTexture().getHeight());
-    shader.setUniform1f("time", ofGetElapsedTimef());
-    
-    pointMesh.drawPointMesh();
-    shader.end();
-    cam.end();
+    outFbo.begin();
+    postShader.begin();
+    postShader.setUniformTexture("texDisplacement", displacementFbo.getTexture(), 1);
+    postShader.setUniform1f("time", ofGetElapsedTimef());
+    displacementFbo.draw(0, 0);
+    postShader.end();
+    outFbo.end();
+    outFbo.draw(0, 0);
     
     if (!toggleGui) {
         gui.drawGui();

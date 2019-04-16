@@ -1,16 +1,22 @@
 
 #version 150
 
-in vec2 texCoordVarying;
+in vec2 texcoordVarying;
+
+uniform sampler2DRect texKinect;
+uniform float time;
+uniform vec2 texSize;
+uniform vec2 texKinectSize;
 
 out vec4 outputColor;
 
-float random2d(vec2 n) {
-    return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
-}
-
 void main()
 {
+    vec2 tc = texcoordVarying;
+    vec2 ratio = tc / texSize * texKinectSize;
     
-    outputColor = vec4(1.);
+    vec4 texel = texture(texKinect, ratio);
+    texel = vec4(vec3(texel.rgb * 2.), texel.a);
+    
+    outputColor = texel;
 }

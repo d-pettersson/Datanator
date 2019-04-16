@@ -1,3 +1,6 @@
 ofxGui
+ofxIpVideoGrabber-master
 ofxOsc
-ofxPostProcessing_tekt
+ofxPoco
+ofxThreadedImageLoader
+ofxXmlSettings

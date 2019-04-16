@@ -1,6 +1,10 @@
-// ----- //
-//  GUI  //
-// ----- //
+//  ------------------------------------------
+//  UI Panel
+//  ------------------------------------------
+//
+//  UI Creation and management
+//
+//  ------------------------------------------
 
 #ifndef gui_h
 #define gui_h
@@ -19,11 +23,7 @@ public:
     void drawGui();
     
     ofxPanel guiPanel;
-    
-    ofxFloatSlider nearThreshold;
-    ofxFloatSlider farThreshold;
 
-    ofxLabel thresholdLabel;
     ofxLabel kinectCheckLabel;
     ofxLabel localIpLabel;
     ofxLabel settingsLoadedLabel;

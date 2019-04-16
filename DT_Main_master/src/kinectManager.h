@@ -1,6 +1,10 @@
 //  ------------------------------------------
 //  Kinect Manager
 //  ------------------------------------------
+//
+//  Setup, init and management of kinect v1.
+//
+//  ------------------------------------------
 
 
 #ifndef kinectManager_h
@@ -27,6 +31,8 @@ public:
     
     int nearThreshold = 0;
     int farThreshold = 1000;
+    
+    int dilatePasses = 5;
 };
 
 #endif /* kinectManager_h */

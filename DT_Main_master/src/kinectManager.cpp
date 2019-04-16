@@ -33,6 +33,10 @@ void KinectManager::updateKinect() {
     
     if (kinect.isFrameNew()) {
         depthTexture.setFromPixels(kinect.getDepthPixels());
+        for (int i = 0; i < dilatePasses; i++) {
+            depthTexture.dilate();
+        }
+        depthTexture.blurGaussian(20);
         depthTexture.mirror(true, true);
     }
 }

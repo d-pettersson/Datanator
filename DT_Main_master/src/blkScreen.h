@@ -1,6 +1,13 @@
-//  ------------------------------------------
+//  -------------------------------------------
 //  Blackout screen
-//  ------------------------------------------
+//  -------------------------------------------
+//
+//  Creates a blackout screen.
+//  Randomised appearance in time and visuals.
+//  Sends out the screen num via osc
+//  to clients.
+//
+//  -------------------------------------------
 
 
 #ifndef blkScreen_h
@@ -27,7 +34,7 @@ public:
     string urlImages;
     string nameImages;
     string formatImages;
-    int numImages;
+    size_t numImages;
     int counterImg = 0;
     bool isImageDrawn;
     
