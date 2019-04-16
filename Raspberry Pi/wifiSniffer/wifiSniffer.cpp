@@ -10,7 +10,7 @@
 
 
 #define PRINT_OUT
-//#define OSC_OUT
+#define OSC_OUT
 
 /* ------------------- *
  * Default constructor *
@@ -34,6 +34,10 @@ void WifiSniffer::run(const std::string& interface) {
     std::cout << "* ------------ * ---------------- *\n"
               << "* WIFI SNIFFER * Running on \033[1;32m" + interface + "\033[0m *\n"
               << "* ------------ * ---------------- *\n\n";
+#endif
+
+#ifdef OSC_OUT
+    std::cout << "OSC Running\n";
 #endif
 
 
@@ -65,8 +69,14 @@ bool WifiSniffer::callback(Tins::PDU &pdu) {
 
 #ifdef OSC_OUT
 
+    std::string vendorOsc = macVendor(mac);
+
     // concat ip addr + mac addr
-    std::string outputStr = ip.src_addr().to_string() + ' ' + mac.src_addr().to_string() + ' ' + ip.dst_addr().to_string() + ' ' + mac.dst_addr().to_string();
+    std::string outputStr = ip.src_addr().to_string() + ' '
+                            + mac.src_addr().to_string() + ' '
+                            + ip.dst_addr().to_string() + ' '
+                            + mac.dst_addr().to_string() + '\n' + ' '
+                            + vendorOsc;
 
     std::string ipSrcAddr = ip.src_addr().to_string();
     std::string ipDstAddr = ip.dst_addr().to_string();
