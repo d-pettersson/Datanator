@@ -13,7 +13,6 @@ public:
     void draw();
     
     ofShader shader;
-    ofFbo mainFbo;
     ofFbo camFbo;
     ofFbo wifiFbo;
     

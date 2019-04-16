@@ -132,7 +132,7 @@ void main() {
 
     float displacement = snoise3(vec3(position.x * scale, position.y * scale, time * .1));
 
-    // scale kinect texture to rander size
+    // scale kinect texture to render size
     vec2 tc = texcoord;
     vec2 ratio = tc / texSize * texKinectSize;
     
@@ -140,6 +140,7 @@ void main() {
     float displacementKinect = snoise3(vec3(displacementKinectBump.x + displacement, displacementKinectBump.y + displacement, displacementKinectBump.z));
 
     vec4 newPosition = position  + normal * displacementKinect;
+    
     gl_Position = modelViewProjectionMatrix * newPosition;
     texcoordVarying = texcoord;
 }

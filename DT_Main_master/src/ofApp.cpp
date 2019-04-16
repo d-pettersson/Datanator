@@ -20,7 +20,7 @@ void ofApp::setup(){
     // XML settings
     mainSettings.load("mainSettings.xml");
     oscLocalIp      = mainSettings.getValue("settings:oscHostIp", "127.0.0.1");
-    oscLocalPort    = mainSettings.getValue("settings:oscHostPort", 12345);
+    oscLocalPort    = mainSettings.getValue("settings:oscHostPort", 57120);
     oscSender.setup(oscLocalIp, oscLocalPort);
     
     pointMesh.setupPointMesh();
@@ -64,7 +64,7 @@ void ofApp::update(){
     blkScreen.updateBlkScreen();
     
     ofxOscMessage oscMsg;
-    oscMsg.setAddress("/blkScreen/counterImg");
+    oscMsg.setAddress("/blkscreen/counterimg");
     oscMsg.addIntArg(blkScreen.counterImg);
     oscMsg.addBoolArg(blkScreen.isImageDrawn);
     oscSender.sendMessage(oscMsg);

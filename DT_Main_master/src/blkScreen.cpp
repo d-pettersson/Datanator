@@ -50,12 +50,6 @@ void BlkScreen::updateBlkScreen() {
         counterImg > 4 ? counterImg = 0 : counterImg;
         selectRandom();
     }
-    
-    if (isMaster && isImageDrawn) {
-        
-    } else {
-        
-    }
 }
 
 void BlkScreen::drawBlkScreen() {
@@ -70,12 +64,8 @@ void BlkScreen::drawBlkScreen() {
 //        distortionFont.drawString(s, ofGetWidth() * .5 - widthString * .5, ofGetHeight() * .5);
 //
 //    }
-    if (isMaster && isImageDrawn) {
+    if (isImageDrawn)
         images[counterImg].draw(0, 0);
-    } else {
-        images[counterImg].draw(-ofGetWidth(), 0);
-        //images[counterImgFromOsc].draw(0, 0);
-    }
 }
 
 void BlkScreen::selectRandom() {

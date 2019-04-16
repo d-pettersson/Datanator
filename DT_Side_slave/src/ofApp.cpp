@@ -19,7 +19,6 @@ void ofApp::setup(){
     shader.load("shader.vert", "shader.frag");
     
     // allocate the framebuffer
-    mainFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA, 4);
     camFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA, 4); // fbo.allocate(width, height, color_mode, num_samples)
     wifiFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA, 4);
     
@@ -53,14 +52,29 @@ void ofApp::update(){
         grabber -> update();
     }
     
-    blkScreen.updateBlkScreen();
+    // osc related
+    ofxOscMessage oscMsg;
+    string message;
+    
+    while (receiver.hasWaitingMessages()) {
+        receiver.getNextMessage(oscMsg);
+        
+        if (oscMsg.getAddress() == "/blkscreen/counterimg") {
+            blkScreen.counterImg = oscMsg.getArgAsInt(0);
+            blkScreen.isImageDrawn = oscMsg.getArgAsBool(1);
+        } else if (oscMsg.getAddress() == "/pi") {
+            message = oscMsg.getArgAsString(0);
+            messages.push_back(message);
+            if (messages.size() > 10) {
+                messages.pop_front();
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofBackground(0);
-    
-    //    ofSetHexColor(0xFFFFFF);
     
     // camera related
     std::size_t row = 0;
@@ -72,23 +86,12 @@ void ofApp::draw(){
     float w = ofGetWidth() / numCameraColumns;
     float h = ofGetHeight() / numCameraRows;
     
-    // osc related
-    ofxOscMessage m;
-    string message;
+
     
     wifiFbo.begin();
     
     // clear buffer in case of artefacts
     ofClear(255, 255, 255, 0);
-    
-    while (receiver.hasWaitingMessages()) {
-        receiver.getNextMessage(m);
-        message = m.getArgAsString(0);
-        messages.push_back(message);
-        if (messages.size() > 10) {
-            messages.pop_front();
-        }
-    }
     
     for(int i = 0; i < messages.size(); i++) {
         distortionFont.drawString(messages[i], 0, i * 120);
@@ -146,12 +149,10 @@ void ofApp::draw(){
 
     int resolution[2] = {ofGetWidth(), ofGetHeight()};
     shader.setUniform3iv("resolution", resolution);
-
-    mainFbo.draw(0, 0); // draw the mainFBO combining the fbos
-
+    camFbo.draw(0, 0);
     shader.end();
-    
     blkScreen.drawBlkScreen();
+
 }
 
 //--------------------------------------------------------------
